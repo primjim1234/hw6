@@ -19,7 +19,39 @@ struct MyStringHash {
     // hash function entry point (i.e. this is h(k))
     HASH_INDEX_T operator()(const std::string& k) const
     {
-        // Add your code here
+    
+    const int MAX_GROUPS = 5;
+    const int GROUP_SIZE = 6;
+
+    unsigned long long w[MAX_GROUPS] = {0, 0, 0, 0, 0};
+
+    int len = k.length();
+    int groupIndex = MAX_GROUPS - 1;
+
+    for(int i = len; i > 0 && groupIndex >= 0; i -= GROUP_SIZE)
+    {
+        unsigned long long value = 0;
+        unsigned long long base = 1;
+
+        int start = std::max(0, i - GROUP_SIZE);
+
+        for(int j = i - 1; j >= start; --j)
+        {
+            value += letterDigitToNumber(k[j]) * base;
+            base *= 36;
+        }
+
+        w[groupIndex] = value;
+        groupIndex--;
+    }
+
+    unsigned long long hash = 0;
+    for(int i = 0; i < MAX_GROUPS; ++i)
+    {
+        hash += rValues[i] * w[i];
+    }
+
+    return hash;
 
 
     }
@@ -27,7 +59,16 @@ struct MyStringHash {
     // A likely helper function is to convert a-z,0-9 to an integral value 0-35
     HASH_INDEX_T letterDigitToNumber(char letter) const
     {
-        // Add code here or delete this helper function if you do not want it
+        if(letter >= 'A' && letter <= 'Z') {
+            letter = letter - 'A' + 'a';
+        }
+        if(letter >= 'a' && letter <= 'z') {
+            return letter - 'a';
+        }
+        else if(letter >= '0' && letter <= '9') {
+            return letter - '0' + 26;
+        }
+        return 0;
 
     }
 
